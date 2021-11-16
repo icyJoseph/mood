@@ -1,5 +1,3 @@
-import "./style.css";
-
 import {
   ReactNode,
   useEffect,
@@ -14,10 +12,15 @@ import {
   useCallback
 } from "react";
 
+import prettier from "prettier";
+
+import htmlParser from "prettier/parser-html";
+import postCssParser from "prettier/parser-postcss";
+
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import dark from "react-syntax-highlighter/dist/cjs/styles/prism/vs-dark";
 
-import { injectHTML, injectCSS } from "../../../src/index";
+import { injectHTML, injectCSS } from "../../src/index";
 
 type CodeEditorProps = {
   language: "html" | "css";
@@ -39,7 +42,8 @@ const theme = {
     padding: "10px",
     overflow: "auto",
     whiteSpace: "nowrap",
-    fontFamily: "monospace"
+    fontFamily: "monospace",
+    borderRadius: "0"
   },
   'code[class*="language-"]': {
     ...dark['code[class*="language-"]'],
@@ -118,6 +122,7 @@ const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
     return (
       <div className="editor-field">
         <textarea
+          id={`${language}-editor`}
           className="editor"
           onChange={handleChange}
           onScroll={synchronizeScroll}
@@ -135,6 +140,10 @@ const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(
         >
           {code}
         </SyntaxHighlighter>
+
+        <label className="editor-label" htmlFor={`${language}-editor`}>
+          {language}
+        </label>
       </div>
     );
   }
@@ -158,13 +167,13 @@ const Renderer = ({
     if (!host) return;
 
     injectHTML(host, html);
-  }, [html]);
+  }, [html, host]);
 
   useEffect(() => {
     if (!host) return;
 
     injectCSS(host, css);
-  }, [css]);
+  }, [css, host]);
 
   return <iframe ref={setRef} className={className} />;
 };
@@ -188,8 +197,23 @@ export const Playground = ({
     setHtml(() => htmlRef.current?.getCurrent() ?? "");
   }, []);
 
-  const runHandler = () => {
-    collectUpdates();
+  const prettierHandler = () => {
+    if (!htmlRef.current) return;
+    if (!cssRef.current) return;
+
+    htmlRef.current.update((currentHTML) =>
+      prettier.format(currentHTML, {
+        parser: "html",
+        plugins: [htmlParser]
+      })
+    );
+
+    cssRef.current.update((currentCSS) =>
+      prettier.format(currentCSS, {
+        parser: "css",
+        plugins: [postCssParser]
+      })
+    );
   };
 
   return (
@@ -200,8 +224,12 @@ export const Playground = ({
         <CodeEditor language="css" ref={cssRef} initial={initialCSS} />
 
         <div className="controls">
-          <button className="run-control" onClick={runHandler}>
+          <button className="run-control" onClick={collectUpdates}>
             Run
+          </button>
+
+          <button className="run-control" onClick={prettierHandler}>
+            Prettier
           </button>
         </div>
       </div>

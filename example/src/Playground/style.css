@@ -1,0 +1,112 @@
+.playground {
+  height: 100%;
+  display: grid;
+  gap: 8px;
+  grid-template-areas: "editor renderer";
+  flex: 1 1 auto;
+}
+
+.editor-group {
+  grid-area: editor;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editor-field {
+  background: white;
+  flex: 3;
+  position: relative;
+  isolation: isolate;
+}
+
+.controls {
+  text-align: center;
+}
+
+.renderer {
+  width: 100%;
+  height: 100%;
+  grid-area: renderer;
+  background: white;
+}
+
+.editor-field,
+.renderer {
+  border: none;
+  box-shadow: 0px 0px 1px black;
+}
+
+.run-control {
+  font-size: 1.75rem;
+  color: hotpink;
+  padding: 12px 16px 16px;
+  border: 2px solid hotpink;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.25 ease-in;
+}
+
+.run-control:hover {
+  color: whitesmoke;
+}
+
+/* text area hacks */
+.editor,
+.editor + pre {
+  /* Both elements need the same text and space styling so they are directly on top of each other */
+  margin: 10px;
+  padding: 10px;
+  border: 0;
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+}
+
+.editor,
+.editor + pre,
+.editor + pre * {
+  /* Also add text styles to highlighing tokens */
+  font-size: 1rem;
+  font-family: monospace;
+  line-height: 1.5;
+  tab-size: 4;
+}
+
+.editor,
+.editor + pre {
+  /* In the same place */
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Move the textarea in front of the result */
+
+.editor {
+  z-index: 1;
+}
+
+.editor + pre {
+  z-index: 0;
+}
+
+/* Prevent resizing */
+.editor {
+  resize: none;
+}
+
+/* Make textarea almost completely transparent */
+
+.editor {
+  color: transparent;
+  background: transparent;
+  caret-color: white; /* Or choose your favourite color */
+}
+
+/* Can be scrolled */
+.editor,
+.editor + pre {
+  overflow: auto;
+  white-space: nowrap; /* Allows textarea to scroll horizontally */
+}

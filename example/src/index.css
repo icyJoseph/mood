@@ -1,0 +1,23 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: rgb(30, 40, 82);
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  flex-flow: column;
+  min-height: 100%;
+  padding: 8px;
+}
